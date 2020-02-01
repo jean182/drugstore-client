@@ -2,15 +2,32 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function PrescriptionListItem(props) {
-  const { prescription } = props;
-  const { dose, drug, firstName, frequency, id, lastName } = prescription;
+  const { deleteAction, prescription } = props;
+  const {
+    additionalNotes,
+    dose,
+    drug,
+    firstName,
+    frequency,
+    id,
+    lastName
+  } = prescription;
   const { genericName } = drug;
+
+  function onDelete(event) {
+    event.preventDefault();
+    deleteAction(prescription.id);
+  }
   return (
     <tr>
       <td className="border px-4 py-2">{`${firstName} ${lastName}`}</td>
       <td className="border px-4 py-2">{genericName}</td>
-      <td className="border px-4 py-2">{dose}</td>
-      <td className="border px-4 py-2">{frequency}</td>
+      <td className="border px-4 py-2">
+        {dose}
+        <span class="lowercase text-indigo-500">mg</span>
+      </td>
+      <td className="border px-4 py-2">{frequency} per day</td>
+      <td className="border px-4 py-2">{additionalNotes}</td>
       <td className="border px-4 py-2">
         <Link
           to={{
@@ -22,6 +39,9 @@ function PrescriptionListItem(props) {
         >
           Edit
         </Link>
+        <button className="ml-3" type="button" onClick={onDelete}>
+          Delete
+        </button>
       </td>
     </tr>
   );

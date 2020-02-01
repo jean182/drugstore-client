@@ -1,13 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function HeaderWrapper() {
   return (
     <nav className="flex items-center justify-between flex-wrap bg-blue-500 p-6">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
-        <Link to="/" className="font-semibold text-xl tracking-tight">
+        <NavLink to="/" className="font-semibold text-xl tracking-tight">
           Drugstore
-        </Link>
+        </NavLink>
       </div>
       <div className="block lg:hidden">
         <button className="flex items-center px-3 py-2 border rounded text-teal-200 border-teal-400 hover:text-white hover:border-white">
@@ -23,20 +23,21 @@ function HeaderWrapper() {
       </div>
       <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
         <div className="text-sm lg:flex-grow">
-          <Link
+          <NavLink
+            activeClassName="font-bold underline text-white"
             to="/prescriptions"
             className="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4"
           >
             Prescription List
-          </Link>
+          </NavLink>
         </div>
         <div>
-          <Link
+          <NavLink
             to="/add"
             className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0"
           >
             Add
-          </Link>
+          </NavLink>
         </div>
       </div>
     </nav>

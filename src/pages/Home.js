@@ -3,7 +3,7 @@ import Ibuprofen from "../assets/ibuprofen.png";
 
 function Home() {
   return (
-    <div className="flex justify-center p-3">
+    <div className="flex justify-center p-3 my-4">
       <div className="max-w-sm rounded overflow-hidden shadow-lg">
         <img className="w-full" src={Ibuprofen} alt="Sunset in the mountains" />
         <div className="px-6 py-4">
@@ -16,13 +16,13 @@ function Home() {
         </div>
         <div className="px-6 py-4">
           <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-            #photography
+            #drugs
           </span>
           <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-            #travel
+            #dose
           </span>
           <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
-            #winter
+            #frequency
           </span>
         </div>
       </div>

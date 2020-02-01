@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 function PrescriptionForm(props) {
   const { action, history, prescription } = props;
   const defaultValue = {
+    id: prescription && prescription.id,
     firstName: prescription ? prescription.firstName : "",
     lastName: prescription ? prescription.lastName : "",
     dose: prescription ? prescription.dose : "",
@@ -166,12 +167,12 @@ function PrescriptionForm(props) {
           >
             Dose
             {values.drug.frequency && (
-              <>
+              <React.Fragment>
                 <span className="text-indigo-500">{` ${first(
                   values.drug.dose
                 )} - ${last(values.drug.dose)} `}</span>
                 <span className="lowercase text-indigo-500">(mg)</span>
-              </>
+              </React.Fragment>
             )}
           </label>
           <input
@@ -197,12 +198,12 @@ function PrescriptionForm(props) {
           >
             Dose Frequency
             {values.drug.frequency && (
-              <>
+              <React.Fragment>
                 <span className="text-indigo-500">{` ${first(
                   values.drug.frequency
                 )} - ${last(values.drug.frequency)} `}</span>
                 <span className="lowercase text-indigo-500">(per-day)</span>
-              </>
+              </React.Fragment>
             )}
           </label>
           <input
@@ -243,7 +244,7 @@ function PrescriptionForm(props) {
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         onClick={submitForm}
       >
-        Add
+        {props.prescription ? "Edit" : "Add"}
       </button>
     </form>
   );
