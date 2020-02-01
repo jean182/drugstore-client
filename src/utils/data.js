@@ -1,11 +1,5 @@
-export const setDrugs = drugs => {
-  return localStorage.setItem("drugs", JSON.stringify(drugs));
-};
+export const freqToArray = frequency =>
+  frequency.split("...").map(item => parseInt(item, 10));
 
-export function getDrugs() {
-  return JSON.parse(localStorage.getItem("drugs"));
-}
-
-export function removeDrugs() {
-  localStorage.removeItem("drugs");
-}
+export const doseToArray = dose =>
+  dose.split("..").map(item => parseFloat(item));
