@@ -1,3 +1,4 @@
+import { createSelector } from "reselect";
 import { call, put, takeLatest } from "redux-saga/effects";
 import { handleActions, createAction } from "redux-actions";
 import { fetchDrugList } from "../../api/drugs";
@@ -28,13 +29,19 @@ const drugListReducer = handleActions(
     [GET_DRUG_LIST_SUCCESS]: (state, action) => {
       const { data } = action.payload
       const drugs = data.map(drug => {
-        const dose = doseToArray(drug.dose);
-        const frequency = freqToArray(drug.frequency);
-        return ({
+        return {
           ...drug,
-          dose ,
-          frequency
-        })
+          name: drug.genericName,
+          conditions: drug.conditions.map(condition => {
+            const dose = doseToArray(condition.dose);
+            const frequency = freqToArray(condition.frequency);
+            return {
+              ...condition,
+              dose,
+              frequency
+            }
+          })
+        }
       })
       return {
         ...state,

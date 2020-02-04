@@ -24,14 +24,14 @@ function PrescriptionListItem(props) {
       <td className="border px-4 py-2">{genericName}</td>
       <td className="border px-4 py-2">
         {dose}
-        <span class="lowercase text-indigo-500">mg</span>
+        <span className="lowercase text-indigo-500">mg</span>
       </td>
       <td className="border px-4 py-2">{frequency} per day</td>
       <td className="border px-4 py-2">{additionalNotes}</td>
       <td className="border px-4 py-2">
         <Link
           to={{
-            pathname: `/${id}/edit`,
+            pathname: `/prescription/${id}/edit`,
             state: {
               prescription
             }

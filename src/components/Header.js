@@ -30,6 +30,13 @@ function HeaderWrapper() {
           >
             Prescription List
           </NavLink>
+          <NavLink
+            activeClassName="font-bold underline text-white"
+            to="/drugs"
+            className="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4"
+          >
+            Drug List
+          </NavLink>
         </div>
         <div>
           <NavLink

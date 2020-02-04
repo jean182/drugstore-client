@@ -1,5 +1,6 @@
 import { handleActions, createAction } from "redux-actions";
 import { all, call, put, takeLatest } from "redux-saga/effects";
+import { doseToArray, freqToArray } from "../../utils/data";
 import { addPrescription, deletePrescriptionList, fetchPrescriptionList, updatePrescription } from "../../api/prescriptions";
 
 export const GET_PRESCRIPTION_LIST = "drugstore/prescriptions/GET_PRESCRIPTION_LIST";
@@ -35,10 +36,29 @@ const prescriptionListReducer = handleActions(
     },
     [GET_PRESCRIPTION_LIST_SUCCESS]: (state, action) => {
       const { data } = action.payload;
+      const prescriptions = data.map(prescription => {
+        const { drug } = prescription;
+
+        return {
+          ...prescription,
+          drug: {
+            ...drug,
+            conditions: drug.conditions.map(condition => {
+              const dose = doseToArray(condition.dose);
+              const frequency = freqToArray(condition.frequency);
+              return {
+                ...condition,
+                dose,
+                frequency
+              }
+            })
+          }
+        }
+      })
       return {
         ...state,
         loading: false,
-        prescriptions:  data
+        prescriptions
       };
     },
     [GET_PRESCRIPTION_LIST_FAIL]: (state, action) => {

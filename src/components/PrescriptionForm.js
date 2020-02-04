@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { first, last, isNumber, isEmpty, omit } from "lodash";
+import { first, isNumber, isEmpty, omit } from "lodash";
 import { useSelector } from "react-redux";
+import Select from "./Select";
+import NumberInput from "./NumberInput";
 
 function PrescriptionForm(props) {
   const { action, history, prescription } = props;
+  console.log(prescription);
   const defaultValue = {
     id: prescription && prescription.id,
     firstName: prescription ? prescription.firstName : "",
@@ -11,11 +14,16 @@ function PrescriptionForm(props) {
     dose: prescription ? prescription.dose : "",
     frequency: prescription ? prescription.frequency : "",
     additionalNotes: prescription ? prescription.additionalNotes : "",
-    drug: prescription ? prescription.drug : {}
+    drug: prescription ? prescription.drug : {},
+    condition: prescription
+      ? prescription.drug.conditions.find(
+          condition => condition.name === prescription.conditionName
+        )
+      : {}
   };
 
-  const drugs = useSelector(state => state.drugListReducer.drugs);
   const [values, setValues] = useState(defaultValue);
+  const drugs = useSelector(state => state.drugListReducer.drugs);
 
   const handleRegularInputChange = event => {
     const { name, value } = event.target;
@@ -29,7 +37,7 @@ function PrescriptionForm(props) {
     setValues({ ...values, [name]: value });
   };
 
-  const handleSelectChange = event => {
+  const handleDrugSelectChange = event => {
     const { value } = event.target;
     if (value !== "default") {
       const id = parseFloat(value, 10);
@@ -38,11 +46,57 @@ function PrescriptionForm(props) {
         ...values,
         dose: first(match.dose),
         drug: match,
+        frequency: first(match.frequency),
+        condition: {}
+      });
+      return;
+    }
+    setValues({ ...values, drug: {}, condition: {}, dose: "", frequency: "" });
+  };
+
+  const handleConditionSelectChange = event => {
+    const { value } = event.target;
+    if (value !== "default") {
+      const id = parseFloat(value, 10);
+      const match = values.drug.conditions.find(
+        condition => condition.id === id
+      );
+      setValues({
+        ...values,
+        dose: first(match.dose),
+        condition: match,
         frequency: first(match.frequency)
       });
       return;
     }
-    setValues({ ...values, drug: {}, dose: "", frequency: "" });
+    setValues({ ...values, condition: {}, dose: "", frequency: "" });
+  };
+
+  const renderConditionSelect = () => {
+    if (isEmpty(values.drug)) return null;
+    const { conditions } = values.drug;
+    return (
+      <Select
+        collection={conditions}
+        value={values.condition ? values.condition.id : "default"}
+        inputName="condition"
+        onSelectChange={handleConditionSelectChange}
+      />
+    );
+  };
+
+  const renderNumberInput = property => {
+    if (isEmpty(values.condition)) return null;
+    const { condition } = values;
+    return (
+      <NumberInput
+        inputName={property}
+        object={condition}
+        onInputChange={handleInputNumberChange}
+        value={values[property]}
+        step={property === "frequency" ? "1" : "0.01"}
+      />
+    );
   };
 
   const submitForm = event => {
@@ -56,7 +110,8 @@ function PrescriptionForm(props) {
       isNumber(values.dose)
     ) {
       const newPrescription = {
-        ...omit(values, "drug"),
+        ...omit(values, ["drug", "condition"]),
+        conditionName: values.condition.name,
         drugId: values.drug.id
       };
       action(newPrescription);
@@ -66,11 +121,10 @@ function PrescriptionForm(props) {
     }
   };
 
+  console.log(values);
+
   const requiredBorderEmpty = value =>
     isEmpty(value) ? "border-red-500" : "border-gray-200";
-
-  const requiredBorderNumber = value =>
-    !isNumber ? "border-red-500" : "border-gray-200";
 
   return (
     <form>
@@ -125,101 +179,17 @@ function PrescriptionForm(props) {
         </div>
       </div>
       <div className="flex flex-wrap -mx-3 mb-2">
-        <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-          <label
-            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            htmlFor="drug"
-          >
-            Drug
-          </label>
-          <div className="relative">
-            <select
-              className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="drug"
-              onChange={handleSelectChange}
-              value={values.drug ? values.drug.id : "default"}
-            >
-              <option value="default">Select Drug</option>
-              {drugs.map(drug => {
-                const { id, genericName } = drug;
-                return (
-                  <option key={id} value={id}>
-                    {genericName}
-                  </option>
-                );
-              })}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-        <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-          <label
-            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            htmlFor="dose"
-          >
-            Dose
-            {values.drug.frequency && (
-              <React.Fragment>
-                <span className="text-indigo-500">{` ${first(
-                  values.drug.dose
-                )} - ${last(values.drug.dose)} `}</span>
-                <span className="lowercase text-indigo-500">(mg)</span>
-              </React.Fragment>
-            )}
-          </label>
-          <input
-            className={`appearance-none block w-full bg-gray-200 text-gray-700 border ${requiredBorderNumber(
-              values.dose
-            )} rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`}
-            id="dose"
-            name="dose"
-            type="number"
-            placeholder="Dose"
-            min={first(values.drug.dose)}
-            max={last(values.drug.dose)}
-            step="0.01"
-            value={values.dose}
-            onChange={handleInputNumberChange}
-            disabled={isEmpty(values.drug)}
-          />
-        </div>
-        <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-          <label
-            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            htmlFor="frequency"
-          >
-            Dose Frequency
-            {values.drug.frequency && (
-              <React.Fragment>
-                <span className="text-indigo-500">{` ${first(
-                  values.drug.frequency
-                )} - ${last(values.drug.frequency)} `}</span>
-                <span className="lowercase text-indigo-500">(per-day)</span>
-              </React.Fragment>
-            )}
-          </label>
-          <input
-            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-            required
-            id="frequency"
-            name="frequency"
-            type="number"
-            placeholder="Daily"
-            min={first(values.drug.frequency)}
-            max={last(values.drug.frequency)}
-            value={values.frequency}
-            onChange={handleInputNumberChange}
-            disabled={isEmpty(values.drug)}
-          />
-        </div>
+        <Select
+          collection={drugs}
+          inputName="drug"
+          value={values.drug ? values.drug.id : "default"}
+          onSelectChange={handleDrugSelectChange}
+        />
+        {values.drug && renderConditionSelect()}
+      </div>
+      <div className="flex flex-wrap -mx-3 mb-2">
+        {!isEmpty(values.condition) && renderNumberInput("dose")}
+        {!isEmpty(values.condition) && renderNumberInput("frequency")}
       </div>
       <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full px-3">
@@ -236,6 +206,7 @@ function PrescriptionForm(props) {
             value={values.additionalNotes}
             onChange={handleRegularInputChange}
             placeholder="Additional Notes"
+            rows="5"
           />
           <p className="text-gray-600 text-xs italic">Optional</p>
         </div>

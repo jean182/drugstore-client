@@ -9,6 +9,8 @@ import NewPrescription from "../pages/NewPrescription";
 import PrescriptionListPage from "../pages/PrescriptionListPage";
 import { getDrugList } from "../redux/modules/drugList";
 import { getPrescriptionList } from "../redux/modules/prescriptionList";
+import DrugListPage from "../pages/DrugListPage";
+import DrugDetailPage from "../pages/DrugDetailPage";
 
 function AppRouter(props) {
   const {
@@ -27,8 +29,14 @@ function AppRouter(props) {
       <Layout>
         <Route path="/" exact component={Home} />
         <Route path="/add" exact component={NewPrescription} />
+        <Route path="/drugs" exact component={DrugListPage} />
+        <Route path="/drugs/:id" exact component={DrugDetailPage} />
         <Route path="/prescriptions" exact component={PrescriptionListPage} />
-        <Route path="/:id/edit" exact component={EditPrescription} />
+        <Route
+          path="/prescription/:id/edit"
+          exact
+          component={EditPrescription}
+        />
       </Layout>
     </Router>
   );
