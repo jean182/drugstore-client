@@ -1,4 +1,3 @@
-import { createSelector } from "reselect";
 import { call, put, takeLatest } from "redux-saga/effects";
 import { handleActions, createAction } from "redux-actions";
 import { fetchDrugList } from "../../api/drugs";
